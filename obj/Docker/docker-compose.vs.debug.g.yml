@@ -1,0 +1,82 @@
+version: '3.4'
+
+services:
+  bookwise.catalog.api:
+    image: bookwisecatalogapi:dev
+    build:
+      target: base
+      labels:
+        com.microsoft.created-by: "visual-studio"
+        com.microsoft.visual-studio.project-name: "BookWise.Catalog.API"
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true
+      - NUGET_FALLBACK_PACKAGES=
+    volumes:
+      - D:\vs projects\BookWise\Services\Catalog\BookWise.Catalog.API:/app
+      - D:\vs projects\BookWise:/src
+      - C:\Users\Abubakar Siddiq\vsdbg\vs2017u5:/remote_debugger:rw
+      - C:\Users\Abubakar Siddiq\.nuget\packages\:/root/.nuget/packages:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+
+    entrypoint: tail -f /dev/null
+    labels:
+      com.microsoft.visualstudio.debuggee.program: "dotnet"
+      com.microsoft.visualstudio.debuggee.arguments: " --additionalProbingPath /root/.nuget/packages  \"/app/bin/Debug/net7.0/BookWise.Catalog.API.dll\""
+      com.microsoft.visualstudio.debuggee.workingdirectory: "/app"
+      com.microsoft.visualstudio.debuggee.killprogram: "/bin/sh -c \"if PID=$$(pidof dotnet); then kill $$PID; fi\""
+    tty: true
+  bookwise.web:
+    image: bookwiseweb.dev:dev
+    build:
+      target: base
+      labels:
+        com.microsoft.created-by: "visual-studio"
+        com.microsoft.visual-studio.project-name: "BookWise.Web"
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true
+      - NUGET_FALLBACK_PACKAGES=
+    volumes:
+      - D:\vs projects\BookWise\Web\BookWise.Web:/app
+      - D:\vs projects\BookWise:/src
+      - C:\Users\Abubakar Siddiq\vsdbg\vs2017u5:/remote_debugger:rw
+      - C:\Users\Abubakar Siddiq\.nuget\packages\:/root/.nuget/packages:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+
+    entrypoint: tail -f /dev/null
+    labels:
+      com.microsoft.visualstudio.debuggee.program: "dotnet"
+      com.microsoft.visualstudio.debuggee.arguments: " --additionalProbingPath /root/.nuget/packages  \"/app/bin/Debug/net7.0/BookWise.Web.dll\""
+      com.microsoft.visualstudio.debuggee.workingdirectory: "/app"
+      com.microsoft.visualstudio.debuggee.killprogram: "/bin/sh -c \"if PID=$$(pidof dotnet); then kill $$PID; fi\""
+    tty: true
+
+  ocelotapigateway:
+    image: ocelotapigateway:dev
+    build:
+      target: base
+      labels:
+        com.microsoft.created-by: "visual-studio"
+        com.microsoft.visual-studio.project-name: "OcelotApiGateWay"
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true
+      - NUGET_FALLBACK_PACKAGES=
+    volumes:
+      - D:\vs projects\BookWise\ApiGateways\OcelotApiGateWay:/app
+      - D:\vs projects\BookWise:/src
+      - C:\Users\Abubakar Siddiq\vsdbg\vs2017u5:/remote_debugger:rw
+      - C:\Users\Abubakar Siddiq\.nuget\packages\:/root/.nuget/packages:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+
+    entrypoint: tail -f /dev/null
+    labels:
+      com.microsoft.visualstudio.debuggee.program: "dotnet"
+      com.microsoft.visualstudio.debuggee.arguments: " --additionalProbingPath /root/.nuget/packages  \"/app/bin/Debug/net7.0/OcelotApiGateWay.dll\""
+      com.microsoft.visualstudio.debuggee.workingdirectory: "/app"
+      com.microsoft.visualstudio.debuggee.killprogram: "/bin/sh -c \"if PID=$$(pidof dotnet); then kill $$PID; fi\""
+    tty: true

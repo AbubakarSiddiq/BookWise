@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "t/5rT4rimEYpp1XckHuDbtfVATVVx/4IlRx6/O0TnU0=",
+  "Source": "BookWise.Catalog.API",
+  "BasePath": "_content/BookWise.Catalog.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

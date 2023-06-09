@@ -1,0 +1,34 @@
+version: '3.4'
+
+services:
+  catalogdb:
+    image: mongo
+
+  bookwise.catalog.api:
+    image: ${DOCKER_REGISTRY-}bookwisecatalogapi
+    build:
+      context: .
+      dockerfile: Services/Catalog/BookWise.Catalog.API/Dockerfile
+
+#web apps
+  bookwise.web:
+    build:
+      context: .
+      dockerfile: Web/BookWise.Web/Dockerfile
+
+#angular client app
+  bookwise.angular.app:
+    build:
+      context: .
+      dockerfile: Web/BookWise.Web/ClientApp/Dockerfile.develop
+
+#api gateways
+  ocelotapigateway:
+    image: ${DOCKER_REGISTRY-}ocelotapigateway
+    build:
+      context: .
+      dockerfile: ApiGateways/OcelotApiGateWay/Dockerfile
+
+#volumes
+volumes:
+  mongo_data:

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\BookWise.Catalog.API.props" />
+</Project>

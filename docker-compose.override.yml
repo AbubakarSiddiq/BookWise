@@ -1,0 +1,63 @@
+version: '3.4'
+
+services:
+  #Databases
+  catalogdb:
+    container_name: catalogdb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+
+  bookwise.catalog.api:
+    container_name: bookwise.catalog.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+    depends_on:
+      - catalogdb
+    ports:
+      - "8001:80"
+
+  bookwise.angular.app:
+    image: bookwiseangularapp:dev
+    container_name: bookwise.angular.app
+    ports:
+      - "4200:4200"
+      - "49156:49153"
+    volumes:
+      - ./Web/BookWise.Web/ClientApp:/app
+
+  bookwise.web:
+    image: bookwiseweb.dev
+    container_name: bookwise.web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - "ApiSettings:GatewayAddress=http://ocelotapigateway"
+      - NG_DEV_SERVER=http://bookwise.angular.app:4200
+      - Services__ApiUrl=http://localhost:8010
+    build:
+        args:
+        - skip_client_build=true
+    ports:
+      - "8087:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    depends_on:
+      - bookwise.angular.app
+      - bookwise.catalog.api
+      - ocelotapigateway
+
+#api gateways
+  ocelotapigateway:
+    container_name: ocelotapigateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8010:80"
+    depends_on:
+      - bookwise.catalog.api

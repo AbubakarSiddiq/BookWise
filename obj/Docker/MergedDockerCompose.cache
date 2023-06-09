@@ -1,0 +1,120 @@
+name: dockercompose6528924605894981199
+services:
+  bookwise.angular.app:
+    build:
+      context: D:\vs projects\BookWise
+      dockerfile: Web/BookWise.Web/ClientApp/Dockerfile.develop
+    container_name: bookwise.angular.app
+    image: bookwiseangularapp:dev
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 4200
+      published: "4200"
+      protocol: tcp
+    - mode: ingress
+      target: 49153
+      published: "49156"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: D:\vs projects\BookWise\Web\BookWise.Web\ClientApp
+      target: /app
+      bind:
+        create_host_path: true
+  bookwise.catalog.api:
+    build:
+      context: D:\vs projects\BookWise
+      dockerfile: Services/Catalog/BookWise.Catalog.API/Dockerfile
+    container_name: bookwise.catalog.api
+    depends_on:
+      catalogdb:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:80
+      DatabaseSettings:ConnectionString: mongodb://catalogdb:27017
+    image: bookwisecatalogapi
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "8001"
+      protocol: tcp
+  bookwise.web:
+    build:
+      context: D:\vs projects\BookWise
+      dockerfile: Web/BookWise.Web/Dockerfile
+      args:
+        skip_client_build: "true"
+    container_name: bookwise.web
+    depends_on:
+      bookwise.angular.app:
+        condition: service_started
+      bookwise.catalog.api:
+        condition: service_started
+      ocelotapigateway:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:80
+      ApiSettings:GatewayAddress: http://ocelotapigateway
+      NG_DEV_SERVER: http://bookwise.angular.app:4200
+      Services__ApiUrl: http://ocelotapigateway
+    image: bookwiseweb.dev
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "8087"
+      protocol: tcp
+    volumes:
+    - type: bind
+      source: C:\Users\Abubakar Siddiq\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+  catalogdb:
+    container_name: catalogdb
+    image: mongo
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 27017
+      published: "27017"
+      protocol: tcp
+    restart: always
+    volumes:
+    - type: volume
+      source: mongo_data
+      target: /data/db
+      volume: {}
+  ocelotapigateway:
+    build:
+      context: D:\vs projects\BookWise
+      dockerfile: ApiGateways/OcelotApiGateWay/Dockerfile
+    container_name: ocelotapigateway
+    depends_on:
+      bookwise.catalog.api:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    image: ocelotapigateway
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "8010"
+      protocol: tcp
+networks:
+  default:
+    name: dockercompose6528924605894981199_default
+volumes:
+  mongo_data:
+    name: dockercompose6528924605894981199_mongo_data
